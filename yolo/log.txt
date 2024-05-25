@@ -1,0 +1,6 @@
+$ python 2onnx.py 
+C:\Users\xxx\AppData\Local\Programs\Python\Python310\lib\site-packages\ultralytics\nn\modules\head.py:54: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  if self.dynamic or self.shape != shape:
+C:\Users\xxx\AppData\Local\Programs\Python\Python310\lib\site-packages\ultralytics\utils\tal.py:299: TracerWarning: Iterating over a tensor might cause the trace to be incorrect. Passing a tensor of different shape won't change the number of iterations executed (and might lead to errors or silently give incorrect results).
+  for i, stride in enumerate(strides):
+Model successfully converted to yolov8n_blood_cell_detection.onnx

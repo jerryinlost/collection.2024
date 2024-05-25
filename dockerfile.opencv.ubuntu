@@ -1,0 +1,112 @@
+# Use the official Ubuntu base image
+FROM ubuntu:22.04
+
+# Set environment variables to avoid prompts during installation
+# ENV DEBIAN_FRONTEND=noninteractive
+
+# Install basic development tools and dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    unzip \
+    pkg-config \
+    mingw-w64 \
+    python3 \
+    python3-pip \
+    python3-numpy \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libgtk2.0-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    gfortran \
+    openexr \
+    libatlas-base-dev \
+    libtbb2 \
+    libtbb-dev \
+    libdc1394-22-dev \
+    libopenblas-dev \
+    liblapacke-dev \
+    libhdf5-dev \
+    libswscale-dev \
+    libavresample-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    && apt-get clean
+
+# Set the working directory
+WORKDIR /opt
+
+# Clone OpenCV and OpenCV contrib repositories
+RUN git clone https://github.com/opencv/opencv.git && \
+    git clone https://github.com/opencv/opencv_contrib.git
+
+# Create a build directory
+RUN mkdir /opt/opencv/build
+WORKDIR /opt/opencv/build
+
+# Create a custom toolchain file for MinGW
+RUN echo "set(CMAKE_SYSTEM_NAME Windows)" > /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)" >> /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)" >> /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)" >> /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> /opt/mingw-w64-x86_64.cmake && \
+    echo "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)" >> /opt/mingw-w64-x86_64.cmake
+
+# Download and build libjpeg-turbo
+RUN wget https://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-2.1.0.tar.gz && \
+    tar -xvzf libjpeg-turbo-2.1.0.tar.gz && \
+    cd libjpeg-turbo-2.1.0 && \
+    mkdir build && cd build && \
+    cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=/opt/mingw-w64-x86_64.cmake \
+        -DCMAKE_INSTALL_PREFIX=/usr/local/x86_64-w64-mingw32 \
+        -DCMAKE_BUILD_TYPE=Release \
+        .. && \
+    make -j$(nproc) && make install
+
+# Configure the build with CMake for MinGW cross-compilation
+RUN cmake -DCMAKE_TOOLCHAIN_FILE=/opt/mingw-w64-x86_64.cmake \
+          -D CMAKE_BUILD_TYPE=Release \
+          -D CMAKE_INSTALL_PREFIX=/usr/local/x86_64-w64-mingw32 \
+          -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib/modules \
+          -D BUILD_SHARED_LIBS=OFF \
+          -D BUILD_opencv_world=ON \
+          -D WITH_PROTOBUF=ON \
+          -D BUILD_EXAMPLES=OFF \
+          -D BUILD_DOCS=OFF \
+          -D BUILD_TESTS=OFF \
+          -D BUILD_PERF_TESTS=OFF \
+          -D CMAKE_C_FLAGS="" \
+          -D CMAKE_CXX_FLAGS="" \
+          -D CMAKE_C_FLAGS_MINSIZEREL="" \
+          -D CMAKE_C_FLAGS_RELEASE="" \
+          -D CMAKE_C_FLAGS_RELWITHDEBINFO="" \
+          -D CMAKE_CXX_FLAGS_MINSIZEREL="" \
+          -D CMAKE_CXX_FLAGS_RELEASE="" \
+          -D CMAKE_CXX_FLAGS_RELWITHDEBINFO="" \
+          ..
+
+# Build and install OpenCV
+RUN make -j$(nproc) && make install
+
+# Clean up
+RUN apt-get remove -y build-essential cmake git wget unzip pkg-config && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
+ENV PATH=/usr/local/x86_64-w64-mingw32/bin:$PATH
+
+# Define entrypoint
+ENTRYPOINT ["/bin/bash"]
