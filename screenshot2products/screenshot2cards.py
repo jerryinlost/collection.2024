@@ -1,67 +1,85 @@
 import cv2
-import numpy as np
-import pytesseract
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Button
 import os
 
-# If you don't have tesseract executable in your PATH, include the following:
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
-# Example tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract'
+class CardExtractor:
+    def __init__(self, image):
+        self.image = image
+        self.start_point = None
+        self.card_width = None
+        self.card_height = None
+        self.figure, self.ax = plt.subplots(figsize=(15, 10))  # Set larger figure size
+        self.ax.imshow(self.image)
+        self.cid = self.figure.canvas.mpl_connect('button_press_event', self.onclick)
+        self.rect = None
 
-def preprocess_image(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-    return thresh
+    def onclick(self, event):
+        if self.start_point is None:
+            self.start_point = (int(event.xdata), int(event.ydata))
+            print(f"Start Point Set: {self.start_point}")
+        elif self.card_width is None and self.card_height is None:
+            self.card_width = abs(int(event.xdata) - self.start_point[0])
+            self.card_height = abs(int(event.ydata) - self.start_point[1])
+            print(f"Card Width: {self.card_width}, Card Height: {self.card_height}")
+            self.draw_rectangle()
 
-def find_contours(thresh):
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    return contours
+    def draw_rectangle(self):
+        if self.rect:
+            self.rect.remove()
+        self.rect = plt.Rectangle(self.start_point, self.card_width, self.card_height,
+                                  linewidth=1, edgecolor='r', facecolor='none')
+        self.ax.add_patch(self.rect)
+        self.figure.canvas.draw()
 
-def extract_text_from_image(image):
-    config = '--psm 6'  # Assume a single uniform block of text.
-    text = pytesseract.image_to_string(image, config=config)
-    return text
+    def extract_cards(self):
+        if self.start_point is None or self.card_width is None or self.card_height is None:
+            print("Please set start point and card dimensions first.")
+            return []
+        x_start, y_start = self.start_point
+        card_images = []
+        y = y_start
+        while y + self.card_height <= self.image.shape[0]:
+            x = x_start
+            while x + self.card_width <= self.image.shape[1]:
+                card = self.image[y:y + self.card_height, x:x + self.card_width]
+                card_images.append(card)
+                x += self.card_width
+            y += self.card_height
+        return card_images
 
-def save_image(image, directory, filename):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    cv2.imwrite(os.path.join(directory, filename), image)
+    def save_cards(self, card_images, output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+        for i, card in enumerate(card_images):
+            output_path = os.path.join(output_dir, f'card_{i+1}.png')
+            cv2.imwrite(output_path, cv2.cvtColor(card, cv2.COLOR_RGB2BGR))
+            print(f'Saved: {output_path}')
 
-def process_screenshot(screenshot_path):
-    if not os.path.exists(screenshot_path):
-        print("File not found!");return
-    image = cv2.imread(screenshot_path)
-    thresh = preprocess_image(image)
-    contours = find_contours(thresh)
+def on_button_click(event):
+    card_images = extractor.extract_cards()
+    if card_images:
+        output_dir = 'extracted_cards'
+        extractor.save_cards(card_images, output_dir)
+        for i, card in enumerate(card_images):
+            plt.figure()
+            plt.imshow(card)
+            plt.axis('off')
+            plt.title(f'Card {i+1}')
+        plt.show()
+    else:
+        print("No cards extracted. Please set the start point and card dimensions first.")
 
-    card_index = 0
+# Load the screenshot image
+screenshot_path = '../samples/screenshot.alibaba.png'
+screenshot = cv2.imread(screenshot_path)
+screenshot_rgb = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
 
-    for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
-        card = image[y:y+h, x:x+w]
+# Initialize the card extractor with the screenshot
+extractor = CardExtractor(screenshot_rgb)
 
-        # Save the card image
-        card_filename = f"card_{card_index}.png"
-        save_image(card, 'cards', card_filename)
-        
-        # Assume product image is at the top of the card
-        product_image = card[0:int(h/2), 0:w]
+# Add a button to extract and save cards
+ax_button = plt.axes([0.8, 0.02, 0.1, 0.05])
+button = Button(ax_button, 'Extract & Save Cards')
+button.on_clicked(on_button_click)
 
-        # Extract text (assuming text is at the bottom of the card)
-        text_block = card[int(h/2):h, 0:w]
-        text = extract_text_from_image(text_block)
-
-        # Extract product name and price (you might need to refine this part depending on the text structure)
-        lines = text.split('\n')
-        product_name = lines[0] if lines else 'unknown_product'
-        price = lines[1] if len(lines) > 1 else 'unknown_price'
-
-        # Save the product image with a unique name
-        product_image_filename = f"{product_name}_{price}.png".replace(' ', '_')
-        save_image(product_image, 'product_images', product_image_filename)
-
-        card_index += 1
-
-if __name__ == "__main__":
-    # screenshot_path = input("Enter the path to the screenshot: ")
-    process_screenshot('screenshot.alibaba.png')#screenshot_path)
-    print("Processing complete. Check 'cards' and 'product_images' directories for results.")
+plt.show()
