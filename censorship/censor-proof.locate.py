@@ -12,7 +12,7 @@ temp_dir = os.path.abspath('../temp')
 os.makedirs(temp_dir, exist_ok=True)
 
 # Compile a regular expression for matching corean characters
-# Covers the complete range of Hangul syllables and Jamo (modern and old)
+# Covers the complete range of Corean syllables and Jamo (modern and old)
 corean_re = re.compile('[\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF\uAC00-\uD7AF]')
 
 def contains_corean(text):

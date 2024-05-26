@@ -3,4 +3,6 @@ pretrained_models
 __pycache__
 *.pyc
 *.onnx
+*.pt
+*.tflite
 audio_cache

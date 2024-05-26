@@ -4,9 +4,9 @@ import re
 file_path = 'path/to/your/file.txt'
 
 # Compile a regular expression for matching corean characters
-# This range covers the complete set of Hangul Syllables (AC00–D7AF), 
-# Hangul Jamo (1100–11FF), Hangul Compatibility Jamo (3130–318F), 
-# Hangul Jamo Extended-A (A960–A97F), Hangul Jamo Extended-B (D7B0–D7FF)
+# This range covers the complete set of Corean Syllables (AC00–D7AF), 
+# Corean Jamo (1100–11FF), Corean Compatibility Jamo (3130–318F), 
+# Corean Jamo Extended-A (A960–A97F), Corean Jamo Extended-B (D7B0–D7FF)
 corean_re = re.compile(r'[\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF\uAC00-\uD7AF]')
 
 # Function to replace corean characters with 'x'

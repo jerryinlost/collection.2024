@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Caution: Not working on mhtml, pdf
+
 import os
 import re
 
@@ -8,7 +10,7 @@ import re
 search_dir = "."
 
 # Compile a regular expression for matching corean characters
-# Covers the complete range of Hangul syllables and Jamo (modern and old)
+# Covers the complete range of Corean syllables and Jamo (modern and old)
 corean_re = re.compile('[\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF\uAC00-\uD7AF]')
 
 def contains_corean(text):
@@ -19,11 +21,17 @@ def contains_corean(text):
 def replace_corean_with_x(text):
     return corean_re.sub('x', text)
 
+extensions = [
+              '.txt','.js', '.md', '.json','.yaml', \
+              '.mhtml','.html','.xml', \
+              '.py', '.go', '.java', '.cpp', '.h','.hpp','.rust','.perl', \
+              ]
+
 def remove_files_with_corean_characters(directory):
     """Walk through the directory, check each .txt and .html file, and remove the ones with corean characters."""
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if any(file.endswith(ext) for ext in ['.txt','html','js','mhtml','.md','.py','json','yaml','.xml']):
+            if any(file.endswith(ext) for ext in extensions):
                 filepath = os.path.join(root, file)
                 try:
                     # Open and read the file
