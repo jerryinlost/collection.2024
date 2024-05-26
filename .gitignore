@@ -6,3 +6,4 @@ __pycache__
 *.pt
 *.tflite
 audio_cache
+.ipynb_checkpoints
