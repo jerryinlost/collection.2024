@@ -7,13 +7,19 @@
 
 - Awesomes
    * llm, llm in china
-   * transfer learning, 
+   * transfer learning, model editing, fine-tuning
 
 - Huggingface
    * https://huggingface.co/facebook
+   * https://huggingface.co/microsoft
+   * https://huggingface.co/MIT
+   * https://huggingface.co/google
+   * https://huggingface.co/spaces
+   * https://huggingface.co/models?sort=downloads
    
 - AI top products
    * https://topai.tools/browse?sort=2
+   * https://www.alibaba.com/
 
 - Blogs
    * https://www.assemblyai.com/blog
@@ -21,33 +27,27 @@
 - Papers
    * https://arxiv.org
 
-### Utilities(Collecting/Self-Writing)
+### Utilities
 
 - crawling arxiv papers
-- handling videos, audios, pdfs, office(xlsx, docx), text
-- handling files and directories
+- handling files(video, audio, pdf, office(xlsx, docx,pptx), text), directories
 
 ### Tools
 
-- pytorch
+- *pytorch*, tensorflow
 - transformers
 - sentencepieces
 - nltk
 
-- onnxruntime
+- *onnx*, tflite, *libtorch*, tensorRT
 
 - ffmpeg
 - librosa
-- speechbrain
-- espnet
-
+- *speechbrain*, espnet, kaldi
 
 ## Takeaways
 
-- VALL-E X
-- 
-
-- Transfer Learning
+- Transfer Learning, Model Editing
 - Graph Neural Network
 - Reinforcement Learning
 - Byte-Pair Encoding
