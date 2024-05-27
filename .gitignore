@@ -3,5 +3,4 @@ pretrained_models
 models
 __pycache__
 *.onnx
-report
 
