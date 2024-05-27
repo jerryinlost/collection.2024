@@ -1,8 +1,8 @@
 from transformers import BertTokenizer, BertModel
 import torch
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('./models/google-bert/bert-base-uncased')
+model = BertModel.from_pretrained('./models/google-bert/bert-base-uncased')
 
 # def extract_features(text):
 #     inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=512)

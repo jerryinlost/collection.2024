@@ -4,11 +4,12 @@ import torch
 import requests
 import matplotlib.pyplot as plt
 
-url = '../samples/zidane.jpg'#"http://images.cocodataset.org/val2017/000000039769.jpg"
+url = './samples/zidane.jpg'#"http://images.cocodataset.org/val2017/000000039769.jpg"
 image = Image.open(url)#requests.get(url, stream=True).raw)
 
-model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
-image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
+model_path = 'hustvl/yolos-tiny'
+model = YolosForObjectDetection.from_pretrained(model_path)
+image_processor = YolosImageProcessor.from_pretrained(model_path)
 
 inputs = image_processor(images=image, return_tensors="pt")
 outputs = model(**inputs)

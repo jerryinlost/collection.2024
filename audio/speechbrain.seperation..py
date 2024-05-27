@@ -1,7 +1,7 @@
 from speechbrain.inference.separation import SepformerSeparation as separator
 import torchaudio
 
-model = separator.from_hparams(source="speechbrain/resepformer-wsj02mix", savedir='pretrained_models/resepformer-wsj02mix')
+model = separator.from_hparams(source="./models/speechbrain/resepformer-wsj02mix")
 
 # for custom file, change path
 est_sources = model.separate_file(path='speechbrain/sepformer-wsj02mix/test_mixture.wav') 

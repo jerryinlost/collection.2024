@@ -2,8 +2,9 @@ from transformers import WhisperProcessor, WhisperForConditionalGeneration
 from datasets import load_dataset
 
 # load model and processor
-processor = WhisperProcessor.from_pretrained("openai/whisper-tiny.en")
-model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny.en")
+model_path = './models/openai/whisper-tiny.en'
+processor = WhisperProcessor.from_pretrained(model_path)#"openai/whisper-tiny.en")
+model = WhisperForConditionalGeneration.from_pretrained(model_path)#"openai/whisper-tiny.en")
 
 # load dummy dataset and read audio files
 ds = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")

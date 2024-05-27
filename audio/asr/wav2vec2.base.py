@@ -3,8 +3,8 @@ from datasets import load_dataset
 import torch
 
 # load model and tokenizer
-processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
-model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
+processor = Wav2Vec2Processor.from_pretrained("./models/facebook/wav2vec2-base-960h")
+model = Wav2Vec2ForCTC.from_pretrained("./models/facebook/wav2vec2-base-960h")
     
 # load dummy dataset and read soundfiles
 ds = load_dataset("patrickvonplaten/librispeech_asr_dummy", "clean", split="validation")
