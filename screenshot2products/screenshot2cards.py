@@ -70,7 +70,7 @@ def on_button_click(event):
         print("No cards extracted. Please set the start point and card dimensions first.")
 
 # Load the screenshot image
-screenshot_path = '../samples/screenshot.alibaba.png'
+screenshot_path = './samples/screenshot.alibaba.png'
 screenshot = cv2.imread(screenshot_path)
 screenshot_rgb = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
 
