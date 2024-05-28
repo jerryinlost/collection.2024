@@ -12,7 +12,10 @@ class CardExtractor:
         self.figure, self.ax = plt.subplots(figsize=(15, 10))  # Set larger figure size
         self.ax.imshow(self.image)
         self.cid = self.figure.canvas.mpl_connect('button_press_event', self.onclick)
+        self.motion_cid = self.figure.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
         self.rect = None
+        self.hline = self.ax.axhline(color='r', linewidth=0.8)  # Horizontal line
+        self.vline = self.ax.axvline(color='r', linewidth=0.8)  # Vertical line
 
     def onclick(self, event):
         if self.start_point is None:
@@ -23,6 +26,12 @@ class CardExtractor:
             self.card_height = abs(int(event.ydata) - self.start_point[1])
             print(f"Card Width: {self.card_width}, Card Height: {self.card_height}")
             self.draw_rectangle()
+
+    def on_mouse_move(self, event):
+        if event.inaxes:
+            self.hline.set_ydata(event.ydata)
+            self.vline.set_xdata(event.xdata)
+            self.figure.canvas.draw()
 
     def draw_rectangle(self):
         if self.rect:
